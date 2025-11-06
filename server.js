@@ -30,16 +30,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'client', 'build')));
-  
-  // Express 5-compatible catch-all route
-  app.get('/(.*)', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-  });
-}
-
+// Removed client build serving for backend-only Render deploy
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
