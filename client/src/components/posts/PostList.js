@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const PostList = () => {
+function PostList() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -47,28 +47,7 @@ const PostList = () => {
 
   return (
     <>
-      <div className="hero-section">
-        <div className="container">
-          <h1>💬 DevTalk Bloggers</h1>
-          <p className="lead">A developer-focused blogging platform where tech enthusiasts share insights, learn from others, and showcase their knowledge</p>
-          {isAuthenticated && (
-            <Link to="/create" className="btn btn-light btn-lg mt-3">
-              Create Your First Post
-            </Link>
-          )}
-          {!isAuthenticated && (
-            <div className="mt-3">
-              <Link to="/register" className="btn btn-light btn-lg me-2">
-                Get Started
-              </Link>
-              <Link to="/login" className="btn btn-outline-light btn-lg">
-                Sign In
-              </Link>
-            </div>
-          )}
-        </div>
-      </div>
-
+      {/* Hero section removed comments earlier */}
       <div className="container mt-4 mb-5">
         <h2 className="mb-4">Latest Blog Posts</h2>
         {posts.length === 0 ? (
@@ -87,10 +66,10 @@ const PostList = () => {
               <div className="col-md-6 col-lg-4 mb-4 fade-in" key={post._id}>
                 <div className="card h-100">
                   {post.imageUrl && (
-                    <img 
-                      src={post.imageUrl} 
-                      className="card-img-top" 
-                      alt={post.title} 
+                    <img
+                      src={`${process.env.REACT_APP_API_URL || ''}${post.imageUrl}`}
+                      className="card-img-top"
+                      alt={post.title}
                       style={{ height: '200px', objectFit: 'cover' }}
                     />
                   )}
@@ -140,7 +119,7 @@ const PostList = () => {
       </div>
     </>
   );
-};
+}
 
 export default PostList;
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const PostDetail = () => {
+function PostDetail() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -106,9 +106,9 @@ const PostDetail = () => {
         <div className="col-lg-10">
           <article className="card border-0 shadow-sm">
             {post.imageUrl && (
-              <img 
-                src={post.imageUrl} 
-                className="post-detail-image" 
+              <img
+                src={`${process.env.REACT_APP_API_URL || ''}${post.imageUrl}`}
+                className="post-detail-image"
                 alt={post.title}
               />
             )}
