@@ -11,7 +11,6 @@ const PostDetail = () => {
   
   const [isAuthor, setIsAuthor] = useState(false);
 
-  // Function to check if current user is the author
   const checkAuthorization = (postData) => {
     const token = localStorage.getItem('token');
     if (token && postData && postData.author) {
@@ -32,10 +31,7 @@ const PostDetail = () => {
       try {
         const res = await axios.get(`/api/posts/${id}`);
         setPost(res.data);
-        
-        // Check if current user is the author
         checkAuthorization(res.data);
-        
         setLoading(false);
       } catch (err) {
         setError('Failed to load post');
@@ -46,7 +42,6 @@ const PostDetail = () => {
     fetchPost();
   }, [id]);
 
-  // Listen for auth changes
   useEffect(() => {
     const handleAuthChange = () => {
       if (post) {

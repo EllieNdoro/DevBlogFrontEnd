@@ -22,16 +22,12 @@ const PostList = () => {
     fetchPosts();
   }, []);
 
-  // Separate useEffect for authentication
   useEffect(() => {
-    // Check authentication status
     const checkAuth = () => {
       setIsAuthenticated(!!localStorage.getItem('token'));
     };
 
     checkAuth();
-    
-    // Listen for auth changes
     window.addEventListener('authChange', checkAuth);
     
     return () => {
@@ -51,7 +47,6 @@ const PostList = () => {
 
   return (
     <>
-      {/* Hero Section */}
       <div className="hero-section">
         <div className="container">
           <h1>💬 DevTalk Bloggers</h1>
@@ -74,7 +69,6 @@ const PostList = () => {
         </div>
       </div>
 
-      {/* Blog Posts Section */}
       <div className="container mt-4 mb-5">
         <h2 className="mb-4">Latest Blog Posts</h2>
         {posts.length === 0 ? (
