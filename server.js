@@ -25,13 +25,6 @@ mongoose.connect(mongoUri || 'mongodb://localhost:27017/dev-blog')
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.error('MongoDB Connection Error:', err));
 
-const fs = require('fs');
-// Configure a persistent upload directory (env var), fallback to local folder
-const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-}
-
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 
@@ -47,22 +40,20 @@ app.get('/uploads/:id', async (req, res) => {
     const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: 'uploads' });
 
     const downloadStream = bucket.openDownloadStream(fileId);
-
     downloadStream.on('file', (file) => {
       res.set('Content-Type', file.contentType || 'application/octet-stream');
     });
-
     downloadStream.on('error', () => {
       res.status(404).json({ message: 'File not found' });
     });
-
     downloadStream.pipe(res);
   } catch (e) {
     res.status(400).json({ message: 'Invalid file id' });
   }
 });
-// Serve uploads from the configured directory
-app.use('/uploads', express.static(UPLOAD_DIR));
+// REMOVE any local static serving like:
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+// and the fs-based folder creation block.
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

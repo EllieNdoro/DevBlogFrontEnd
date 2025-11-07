@@ -56,8 +56,8 @@ const upload = multer({ storage });
 router.post('/', auth, upload.single('image'), async (req, res) => {
   try {
     const { title, subtitle, content } = req.body;
-
     let imageUrl = null;
+
     if (req.file) {
       const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: 'uploads' });
       const filename = Date.now() + path.extname(req.file.originalname);
@@ -68,12 +68,8 @@ router.post('/', auth, upload.single('image'), async (req, res) => {
       readable.push(null);
 
       const uploadStream = bucket.openUploadStream(filename, { contentType: req.file.mimetype });
-
       await new Promise((resolve, reject) => {
-        readable
-          .pipe(uploadStream)
-          .on('error', reject)
-          .on('finish', () => resolve());
+        readable.pipe(uploadStream).on('error', reject).on('finish', resolve);
       });
 
       imageUrl = `/uploads/${uploadStream.id.toString()}`;
@@ -99,7 +95,6 @@ router.put('/:id', auth, upload.single('image'), async (req, res) => {
   try {
     const { title, subtitle, content } = req.body;
     const post = await BlogPost.findById(req.params.id);
-
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
@@ -121,12 +116,8 @@ router.put('/:id', auth, upload.single('image'), async (req, res) => {
       readable.push(null);
 
       const uploadStream = bucket.openUploadStream(filename, { contentType: req.file.mimetype });
-
       await new Promise((resolve, reject) => {
-        readable
-          .pipe(uploadStream)
-          .on('error', reject)
-          .on('finish', () => resolve());
+        readable.pipe(uploadStream).on('error', reject).on('finish', resolve);
       });
 
       post.imageUrl = `/uploads/${uploadStream.id.toString()}`;
