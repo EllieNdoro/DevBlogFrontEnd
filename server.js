@@ -26,8 +26,10 @@ mongoose.connect(mongoUri || 'mongodb://localhost:27017/dev-blog')
   .catch(err => console.error('MongoDB Connection Error:', err));
 
 const fs = require('fs');
-if (!fs.existsSync('uploads')) {
-  fs.mkdirSync('uploads');
+// Configure a persistent upload directory (env var), fallback to local folder
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
 
 app.use('/api/auth', authRoutes);
@@ -37,7 +39,30 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the Developer Blogging API' });
 });
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve uploads from MongoDB GridFS by file id
+app.get('/uploads/:id', async (req, res) => {
+  try {
+    const { ObjectId } = require('mongodb');
+    const fileId = new ObjectId(req.params.id);
+    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: 'uploads' });
+
+    const downloadStream = bucket.openDownloadStream(fileId);
+
+    downloadStream.on('file', (file) => {
+      res.set('Content-Type', file.contentType || 'application/octet-stream');
+    });
+
+    downloadStream.on('error', () => {
+      res.status(404).json({ message: 'File not found' });
+    });
+
+    downloadStream.pipe(res);
+  } catch (e) {
+    res.status(400).json({ message: 'Invalid file id' });
+  }
+});
+// Serve uploads from the configured directory
+app.use('/uploads', express.static(UPLOAD_DIR));
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
