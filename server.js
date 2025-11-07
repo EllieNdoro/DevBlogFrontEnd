@@ -32,7 +32,10 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the Developer Blogging API' });
 });
 
-// Serve uploads from MongoDB GridFS by file id
+// IMPORTANT: Remove local static serving of uploads
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Stream files from GridFS by id
 app.get('/uploads/:id', async (req, res) => {
   try {
     const { ObjectId } = require('mongodb');
@@ -51,9 +54,7 @@ app.get('/uploads/:id', async (req, res) => {
     res.status(400).json({ message: 'Invalid file id' });
   }
 });
-// REMOVE any local static serving like:
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
-// and the fs-based folder creation block.
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

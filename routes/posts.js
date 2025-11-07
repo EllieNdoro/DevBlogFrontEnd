@@ -49,7 +49,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Use GridFS via in-memory storage instead of disk
+// Use memory storage and stream into MongoDB GridFS
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
