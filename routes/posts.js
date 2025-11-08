@@ -50,7 +50,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// REMOVE disk storage and use memory storage for GridFS instead
+// REMOVE disk storage (UPLOAD_DIR + multer.diskStorage) and use memory storage for GridFS
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
