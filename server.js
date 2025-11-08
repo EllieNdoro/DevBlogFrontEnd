@@ -58,24 +58,6 @@ app.get('/uploads/:id', async (req, res) => {
     res.status(400).json({ message: 'Invalid file id' });
   }
 });
-app.get('/uploads/:id', async (req, res) => {
-  try {
-    const { ObjectId } = require('mongodb');
-    const fileId = new ObjectId(req.params.id);
-    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: 'uploads' });
-
-    const downloadStream = bucket.openDownloadStream(fileId);
-    downloadStream.on('file', (file) => {
-      res.set('Content-Type', file.contentType || 'application/octet-stream');
-    });
-    downloadStream.on('error', () => {
-      res.status(404).json({ message: 'File not found' });
-    });
-    downloadStream.pipe(res);
-  } catch (e) {
-    res.status(400).json({ message: 'Invalid file id' });
-  }
-});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
