@@ -1,3 +1,4 @@
+// Top-level of the file (router setup)
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -49,7 +50,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Use memory storage and stream into MongoDB GridFS
+// REMOVE disk storage and use memory storage for GridFS instead
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
