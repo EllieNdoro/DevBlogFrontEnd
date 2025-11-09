@@ -36,10 +36,6 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the Developer Blogging API' });
 });
 
-// IMPORTANT: Remove local static serving of uploads
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Stream files from GridFS by id
 app.get('/uploads/:id', async (req, res) => {
   try {
     const { ObjectId } = require('mongodb');

@@ -50,7 +50,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Use in-memory multer and stream image into MongoDB GridFS
+// Use in-memory multer and stream into MongoDB GridFS (disk storage removed)
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
@@ -58,32 +58,23 @@ router.post('/', auth, upload.single('image'), async (req, res) => {
   try {
     const { title, subtitle, content } = req.body;
     let imageUrl = null;
-
     if (req.file) {
       const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: 'uploads' });
       const filename = Date.now() + path.extname(req.file.originalname);
-
+  
       const readable = new Readable();
       readable._read = () => {};
       readable.push(req.file.buffer);
       readable.push(null);
-
+  
       const uploadStream = bucket.openUploadStream(filename, { contentType: req.file.mimetype });
       await new Promise((resolve, reject) => {
         readable.pipe(uploadStream).on('error', reject).on('finish', resolve);
       });
-
+  
       imageUrl = `/uploads/${uploadStream.id.toString()}`;
     }
-
-    const post = new BlogPost({
-      title,
-      subtitle,
-      content,
-      author: req.user.id,
-      imageUrl
-    });
-
+    const post = new BlogPost({ title, subtitle, content, author: req.user.id, imageUrl });
     await post.save();
     res.status(201).json(post);
   } catch (error) {
@@ -110,17 +101,17 @@ router.put('/:id', auth, upload.single('image'), async (req, res) => {
     if (req.file) {
       const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: 'uploads' });
       const filename = Date.now() + path.extname(req.file.originalname);
-
+  
       const readable = new Readable();
       readable._read = () => {};
       readable.push(req.file.buffer);
       readable.push(null);
-
+  
       const uploadStream = bucket.openUploadStream(filename, { contentType: req.file.mimetype });
       await new Promise((resolve, reject) => {
         readable.pipe(uploadStream).on('error', reject).on('finish', resolve);
       });
-
+  
       post.imageUrl = `/uploads/${uploadStream.id.toString()}`;
     }
 
